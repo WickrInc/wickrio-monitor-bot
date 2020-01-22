@@ -189,6 +189,8 @@ async function inputTokens() {
 
       if (process.env.WICKRIO_BOT_NAME !== undefined) {
         var newName = "WickrIO-Monitor-Bot_" + process.env.WICKRIO_BOT_NAME;
+      } else if (newObjectResult.WICKRIO_BOT_NAME.value !== undefined) {
+        var newName = "WickrIO-Monitor-Bot_" + newObjectResult.WICKRIO_BOT_NAME.value;
       } else {
         var newName = "WickrIO-Monitor-Bot";
       }
@@ -253,3 +255,4 @@ function processConfigured()
 
     return true;
 }
+
