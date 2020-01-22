@@ -40,11 +40,29 @@ process.on('uncaughtException', exitHandler.bind(null, {
 main();
 
 async function main() {
-  try {
-    var it = await inputTokens();
+  if (processConfigured()) {
+    try {
+      var cp = execSync('cp processes.json processes_backup.json');
+      if (dataParsed.apps[0].env.tokens.WICKRIO_BOT_NAME.value !== undefined) {
+        var newName = "WickrIO-Monitor-Bot_" + dataParsed.apps[0].env.tokens.WICKRIO_BOT_NAME.value;
+      } else {
+        var newName = "WickrIO-Monitor-Bot";
+      }
+      //var assign = Object.assign(dataParsed.apps[0].name, newName);
+      dataParsed.apps[0].name = newName;
+      var ps = fs.writeFileSync('./processes.json', JSON.stringify(dataParsed, null, 2));
+    } catch (err) {
+      console.log(err);
+    }
+    console.log("Already configured");
     process.exit();
-  } catch (err) {
-    console.log(err);
+  } else {
+    try {
+      var it = await inputTokens();
+      process.exit();
+      } catch (err) {
+      console.log(err);
+    }
   }
 }
 
@@ -168,6 +186,16 @@ async function inputTokens() {
     }
     try {
       var cp = execSync('cp processes.json processes_backup.json');
+
+      if (process.env.WICKRIO_BOT_NAME !== undefined) {
+        var newName = "WickrIO-Monitor-Bot_" + process.env.WICKRIO_BOT_NAME;
+      } else if (newObjectResult.WICKRIO_BOT_NAME.value !== undefined) {
+        var newName = "WickrIO-Monitor-Bot_" + newObjectResult.WICKRIO_BOT_NAME.value;
+      } else {
+        var newName = "WickrIO-Monitor-Bot";
+      }
+      dataParsed.apps[0].name = newName;
+
       var assign = Object.assign(dataParsed.apps[0].env.tokens, newObjectResult);
       var ps = fs.writeFileSync('./processes.json', JSON.stringify(dataParsed, null, 2));
     } catch (err) {
@@ -194,3 +222,37 @@ function readFileInput() {
     process.exit();
   }
 }
+
+function processConfigured()
+{
+    var processes;
+    try {
+        processes = fs.readFileSync('./processes.json', 'utf-8');
+        if (!processes) {
+          console.log("Error reading processes.json!")
+          return false;
+        }
+    }
+    catch (err) {
+        console.log(err);
+        return false;
+    }
+
+    var pjson = JSON.parse(processes);
+    if (pjson.apps[0].env.tokens === undefined) {
+        return false;
+    }
+
+    if (pjson.apps[0].env.tokens.WICKRIO_BOT_NAME === undefined) {
+        return false;
+    }
+    if (pjson.apps[0].env.tokens.PAGERDUTY_API_KEY === undefined) {
+        return false;
+    }
+    if (pjson.apps[0].env.tokens.NEIGHBOR_BOTS_LIST === undefined) {
+        return false;
+    }
+
+    return true;
+}
+
