@@ -6,14 +6,14 @@ import path from 'path'
 import ping from './ping.js'
 import https from 'https'
 import winston from 'winston'
-const WickrUser = WickrIOBotAPI.WickrUser
+// const WickrUser = WickrIOBotAPI.WickrUser
 const bot = new WickrIOBotAPI.WickrIOBot()
 
-process.stdin.resume() //so the program will not close instantly
+process.stdin.resume() // so the program will not close instantly
 
-var tokens = JSON.parse(process.env.tokens)
-var bot_username = tokens.WICKRIO_BOT_NAME.value
-var pdapiToken, neighborsList
+const tokens = JSON.parse(process.env.tokens)
+const botUsername = tokens.WICKRIO_BOT_NAME.value
+let pdapiToken, neighborsList
 
 process.env.NODE_ENV = 'development'
 
@@ -44,16 +44,16 @@ async function exitHandler(exitOptions, err) {
   console.log('Exit error:', err)
   console.log('exitOptions:', exitOptions)
   try {
-    var monitor_bot = {
-      id: bot_username,
-      state: 'SHUTTINGDOWN',
-    }
-    //TODO in future send to neighbor so they know our state
-    var summary = bot_username + ' is SHUTTING DOWN.'
-    var payload = JSON.stringify({
+    // const monitorBot = {
+    //   id: botUsername,
+    //   state: 'SHUTTINGDOWN',
+    // }
+    // TODO in future send to neighbor so they know our state
+    const summary = botUsername + ' is SHUTTING DOWN.'
+    const payload = JSON.stringify({
       payload: {
         summary: summary,
-        source: bot_username,
+        source: botUsername,
         severity: 'info',
       },
       routing_key: pdapiToken,
@@ -74,7 +74,7 @@ async function exitHandler(exitOptions, err) {
       const req = https.request(options, res => {
         // logger.info(`statusCode: ${res.statusCode}`)
         res.on('data', d => {
-          var incident = 'Exit Incident created: ' + d
+          const incident = 'Exit Incident created: ' + d
           d = JSON.parse(d)
           bot.incident_dedup_key = JSON.stringify(d.dedup_key)
           resolve(incident)
@@ -89,7 +89,7 @@ async function exitHandler(exitOptions, err) {
     })
       .then(async function (incident) {
         logger.info(incident)
-        var closed = await bot.close()
+        await bot.close()
         logger.error('Exit options:' + exitOptions)
         if (err || exitOptions.exit) {
           logger.error('Exit reason:' + err)
@@ -100,33 +100,33 @@ async function exitHandler(exitOptions, err) {
       })
       .catch(error => {
         logger.error(error)
-        reject(error)
+        // reject(error)
       })
   } catch (err) {
     logger.error(err)
   }
 }
 
-//catches ctrl+c and stop.sh events
+// catches ctrl+c and stop.sh events
 process.on('SIGINT', exitHandler.bind(null, { exit: true }))
 
 // catches "kill pid" (for example: nodemon restart)
 process.on('SIGUSR1', exitHandler.bind(null, { pid: true }))
 process.on('SIGUSR2', exitHandler.bind(null, { pid: true }))
 
-//catches uncaught exceptions
+// catches uncaught exceptions
 process.on('uncaughtException', exitHandler.bind(null, { exit: true }))
 
-var neighbors = []
+const neighbors = []
 module.exports.neighbors = neighbors
 module.exports.PagerDutyAlert = PagerDutyAlert
 
 async function main() {
   try {
-    var status
+    let status
     await sleep(5000)
     if (process.argv[2] === undefined) {
-      status = await bot.start(bot_username)
+      status = await bot.start(botUsername)
     } else {
       status = await bot.start(process.argv[2])
     }
@@ -152,7 +152,7 @@ async function main() {
     }
     neighborsList = neighborsList.split(',')
     logger.info('neighborsList:' + neighborsList)
-    for (var i in neighborsList) {
+    for (const i in neighborsList) {
       neighbors.push({
         id: neighborsList[i],
         state: 'UP',
@@ -161,11 +161,11 @@ async function main() {
       })
     }
     logger.info('neighbors: ' + neighbors)
-    var monitor_bot = {
-      id: bot_username,
+    const monitorBot = {
+      id: botUsername,
       state: 'STARTINGUP',
     }
-    PagerDutyAlert(monitor_bot)
+    PagerDutyAlert(monitorBot)
     await bot.startListening(listen)
     ping.ping()
   } catch (err) {
@@ -175,7 +175,7 @@ async function main() {
 
 async function PagerDutyAlert(bot) {
   try {
-    var summary
+    let summary
     if (bot.state === 'STARTINGUP') {
       logger.alert(bot.id + ' STARTING UP.')
       summary = bot.id + ' is STARTING UP.'
@@ -185,19 +185,19 @@ async function PagerDutyAlert(bot) {
           ' is not responding. Timestamp: ' +
           bot.timestamp +
           '. Created by: ' +
-          bot_username
+          botUsername
       )
       summary =
         bot.id +
         ' is not responding. Timestamp: ' +
         bot.timestamp +
         '. Created by: ' +
-        bot_username
+        botUsername
     }
-    var payload = JSON.stringify({
+    const payload = JSON.stringify({
       payload: {
         summary: summary,
-        source: bot_username,
+        source: botUsername,
         severity: 'info',
       },
       routing_key: pdapiToken,
@@ -235,8 +235,8 @@ async function PagerDutyAlert(bot) {
 async function resolveAlert(bot) {
   try {
     logger.alert(bot + ' is back up')
-    var summary = bot.id + ' is back up.' + ' Created by: ' + bot_username
-    var payload = JSON.stringify({
+    // const summary = bot.id + ' is back up.' + ' Created by: ' + botUsername
+    const payload = JSON.stringify({
       routing_key: pdapiToken,
       dedup_key: bot.incident_dedup_key,
       event_action: 'resolve',
@@ -270,30 +270,31 @@ async function resolveAlert(bot) {
   }
 }
 
-function listen(message) {
+function listen(msg) {
   try {
-    var parsedMessage = bot.parseMessage(message) //Parses an incoming message and returns and object with command, argument, vGroupID and Sender fields
+    const parsedMessage = bot.parseMessage(msg) // Parses an incoming message and returns and object with command, argument, vGroupID and Sender fields
     if (!parsedMessage) {
       return
     }
     logger.info('New incoming Message: ' + JSON.stringify(parsedMessage))
     console.log('New incoming Message: ' + JSON.stringify(parsedMessage))
-    var message = parsedMessage.message
-    var userEmail = parsedMessage.userEmail
-    var neighborBot = neighbors.find(
+
+    const { userEmail } = parsedMessage
+
+    const neighborBot = neighbors.find(
       neighborBot => neighborBot.id === userEmail
     )
     if (!neighborBot) return
     if (neighborBot.state === 'DOWN') {
       resolveAlert(neighborBot)
-      //TODO Always set to up on recieve message?
+      // TODO Always set to up on recieve message?
       neighborBot.state = 'UP'
     }
     neighborBot.waiting = false
     neighborBot.attempts = 0
-    var reply = +new Date()
-    var users = [userEmail]
-    var sMessage = WickrIOAPI.cmdSend1to1Message(users, reply) //Respond back to the user(using user wickrEmail)
+    const reply = +new Date()
+    const userList = [userEmail]
+    const sMessage = WickrIOAPI.cmdSend1to1Message(userList, reply) // Respond back to the user(using user wickrEmail)
     logger.info(sMessage)
   } catch (err) {
     logger.error(err)
