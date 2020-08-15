@@ -4,7 +4,7 @@
       "name": "WickrIO-Monitor-Bot",
       "args": [],
       "script": "./build/index.js",
-      "exec_interpreter": "exec",
+      "exec_interpreter": "node",
       "autorestart": false,
       "watch": ["package.json"],
       "ignore_watch": [".git"],
