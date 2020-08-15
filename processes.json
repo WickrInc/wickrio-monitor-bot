@@ -1,20 +1,18 @@
 {
-  "apps": [{
-    "name": "WickrIO-Monitor-Bot",
-    "args": [],
-    "script": "node monitor-bot.js",
-    "exec_interpreter": "none",
-    "autorestart": false,
-    "watch": [
-      "package.json"
-    ],
-    "ignore_watch": [
-      ".git"
-    ],
-    "env": {
-      "tokens": {}
-    },
-    "out_file": "log.output",
-    "error_file": "err.output"
-  }]
+  "apps": [
+    {
+      "name": "WickrIO-Monitor-Bot",
+      "args": [],
+      "script": "./build/index.js",
+      "exec_interpreter": "exec",
+      "autorestart": false,
+      "watch": ["package.json"],
+      "ignore_watch": [".git"],
+      "env": {
+        "tokens": {}
+      },
+      "out_file": "log.output",
+      "error_file": "err.output"
+    }
+  ]
 }
