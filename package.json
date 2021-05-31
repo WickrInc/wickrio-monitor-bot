@@ -16,7 +16,7 @@
     "winston-syslog": "^2.2.0"
   },
   "scripts": {
-    "start": "/etc/init.d/mysql start && forever start -m 1 ./forever.json",
+    "start": "forever start -m 5 ./forever.json",
     "stop": "forever stopall",
     "restart": "forever restartall"
   },
