@@ -1,0 +1,10 @@
+{
+  "uid": "wickrio-monitor-bot",
+  "append": true,
+  "watch": false,
+  "script": "./monitor-bot.js",
+  "sourceDir": "",
+  "logFile": "",
+  "outFile": "",
+  "errFile": ""
+}
