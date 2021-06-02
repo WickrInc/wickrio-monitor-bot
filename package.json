@@ -1,6 +1,6 @@
 {
   "name": "wickrio-monitor-bot",
-  "version": "5.82.1",
+  "version": "5.82.2",
   "description": "WickrIO Node.js Monitor bot",
   "main": "monitor-bot.js",
   "author": "Paul Cushman",
@@ -17,8 +17,8 @@
   },
   "scripts": {
     "start": "forever start -m 5 ./forever.json",
-    "stop": "forever stopall",
-    "restart": "forever restartall"
+    "stop": "forever stop wickrio-monitor-bot",
+    "restart": "forever restart wickrio-monitor-bot"
   },
   "repository": {
     "type": "git",

@@ -11,6 +11,8 @@ const winston = require('winston');
 
 process.stdin.resume(); //so the program will not close instantly
 
+bot.processesJsonToProcessEnv()
+
 var tokens = JSON.parse(process.env.tokens);
 var bot_username = tokens.WICKRIO_BOT_NAME.value;
 var pdapiToken,

@@ -3,8 +3,8 @@
   "append": true,
   "watch": false,
   "script": "./monitor-bot.js",
-  "sourceDir": "",
-  "logFile": "",
-  "outFile": "",
-  "errFile": ""
+  "sourceDir": ".",
+  "logFile": "./log.output",
+  "outFile": "./outfile.output",
+  "errFile": "./err.output"
 }
