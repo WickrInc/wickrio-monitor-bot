@@ -1,6 +1,6 @@
 {
   "name": "wickrio-monitor-bot",
-  "version": "5.82.2",
+  "version": "5.112.1",
   "description": "WickrIO Node.js Monitor bot",
   "main": "monitor-bot.js",
   "author": "Paul Cushman",
